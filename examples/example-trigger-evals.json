@@ -1,0 +1,22 @@
+[
+  {"query": "who actually destroyed clae again? gyr or the kotchans? writing a scene where a claeran refugee rants about it", "should_trigger": true},
+  {"query": "statting a Khaiyo official for next session — what religion would he follow and how does khaiyo feel about sonbu lately?", "should_trigger": true},
+  {"query": "draft a bit of in-world lore about the bleeding phoenix's attack on the andranic coast", "should_trigger": true},
+  {"query": "what's the actual difference between arcane arts and sacred arts in my world", "should_trigger": true},
+  {"query": "remind me which great clans make up Kotcha and who rules them", "should_trigger": true},
+  {"query": "add a new student NPC at the temple school — a concept that fits Sonbu and the academy", "should_trigger": true},
+  {"query": "would it be weird for a character from Hwyn to worship the Owaian pantheon, or is that consistent?", "should_trigger": true},
+  {"query": "write the read-aloud for when the players first arrive at Sente Island", "should_trigger": true},
+  {"query": "what do my players actually know about the god-beasts vs what's secret?", "should_trigger": true},
+  {"query": "give me the full secret version of the elven star empire backstory", "should_trigger": true},
+  {"query": "what's a good initiative system for a homebrew ttrpg? d20 feels too swingy", "should_trigger": false},
+  {"query": "analyze the prose voice in my lore docs and tell me my style", "should_trigger": false},
+  {"query": "what nations border France and what's the dominant religion there?", "should_trigger": false},
+  {"query": "explain how Foundation and Jade realms work in Will Wight's Cradle books", "should_trigger": false},
+  {"query": "how much XP does it cost to raise an attribute in TITAN?", "should_trigger": false},
+  {"query": "fix the dataview frontmatter in my obsidian character template, it's broken", "should_trigger": false},
+  {"query": "write me a gritty first-person grimdark short story about a mercenary", "should_trigger": false},
+  {"query": "summarize the grappling rules in D&D 5e", "should_trigger": false},
+  {"query": "name a cozy tavern for a generic fantasy village", "should_trigger": false},
+  {"query": "what's winter weather like in the real Sea of Japan?", "should_trigger": false}
+]
