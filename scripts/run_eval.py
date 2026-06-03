@@ -62,15 +62,22 @@ def run_single_query(
     """
     unique_id = uuid.uuid4().hex[:8]
     clean_name = f"{skill_name}-skill-{unique_id}"
-    # Register the candidate as a temporary SKILL (not a slash command): current
-    # Claude Code autonomously triggers skills via the Skill tool, but does not
-    # autonomously invoke .claude/commands entries. Writing a real skill makes
-    # the trigger test faithful to how skills actually fire.
-    # Each query gets its own throwaway project root so parallel workers don't
-    # see each other's (identically-described) candidate skills, and so the real
-    # vault skill never competes. cwd of claude -p is set to this root below.
-    proj_root = Path(tempfile.mkdtemp(prefix="trigeval_"))
-    skill_dir = proj_root / ".claude" / "skills" / clean_name
+    # Register the candidate as a temporary SKILL in an ISOLATED config dir.
+    #
+    # The trap: `claude -p` discovers user-scope skills from the user's config
+    # dir (~/.claude/skills or $CLAUDE_CONFIG_DIR/skills) REGARDLESS of cwd. If
+    # the skill under test is already installed there (the normal case on a dev
+    # machine), the real skill competes with — and beats — the candidate: the
+    # model fires `Skill(skill="<real-name>")`, the clean_name match below never
+    # succeeds, and every query scores 0. A throwaway *project* root does NOT
+    # hide user-scope skills, which is why the old cwd-only isolation failed.
+    #
+    # Fix: give the subprocess its own CLAUDE_CONFIG_DIR containing ONLY the
+    # candidate skill (plus copied credentials so auth still works). The
+    # candidate is then the sole skill in scope, the model can only fire the
+    # clean_name, and we genuinely measure the candidate description.
+    cfg_root = Path(tempfile.mkdtemp(prefix="trigcfg_"))
+    skill_dir = cfg_root / "skills" / clean_name
     command_file = skill_dir / "SKILL.md"
 
     try:
@@ -88,6 +95,19 @@ def run_single_query(
         )
         command_file.write_text(command_content)
 
+        # Seed the isolated config dir with credentials so `claude -p` stays
+        # authenticated. Source = the parent session's effective config dir
+        # ($CLAUDE_CONFIG_DIR if set, else ~/.claude). Auth via ANTHROPIC_API_KEY
+        # in the env (inherited below) also works and needs no file.
+        src_cfg = Path(os.environ.get("CLAUDE_CONFIG_DIR") or (Path.home() / ".claude"))
+        for fname in (".credentials.json", "settings.json"):
+            src = src_cfg / fname
+            if src.exists():
+                try:
+                    shutil.copy2(src, cfg_root / fname)
+                except OSError:
+                    pass
+
         cmd = [
             "claude",
             "-p", query,
@@ -100,14 +120,17 @@ def run_single_query(
 
         # Remove CLAUDECODE env var to allow nesting claude -p inside a
         # Claude Code session. The guard is for interactive terminal conflicts;
-        # programmatic subprocess usage is safe.
+        # programmatic subprocess usage is safe. CLAUDE_CONFIG_DIR points the
+        # subprocess at the isolated config so only the candidate skill loads.
         env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+        env["CLAUDE_CONFIG_DIR"] = str(cfg_root)
 
         process = subprocess.Popen(
             cmd,
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            cwd=str(proj_root),
+            cwd=str(cfg_root),
             env=env,
         )
 
@@ -187,7 +210,7 @@ def run_single_query(
 
         return triggered
     finally:
-        shutil.rmtree(proj_root, ignore_errors=True)
+        shutil.rmtree(cfg_root, ignore_errors=True)
 
 
 def run_eval(

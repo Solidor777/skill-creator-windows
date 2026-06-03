@@ -1,0 +1,23 @@
+[
+  {"query": "extract all the tables from this scanned PDF into CSV", "should_trigger": true},
+  {"query": "pull the text out of a 200-page PDF report so I can search it", "should_trigger": true},
+  {"query": "this PDF is a bunch of scanned images — can you OCR it and give me the text?", "should_trigger": true},
+  {"query": "split this PDF into one file per chapter and rename them by heading", "should_trigger": true},
+  {"query": "merge these 12 invoices into a single PDF in date order", "should_trigger": true},
+  {"query": "the form fields in this PDF aren't filling — read its AcroForm structure", "should_trigger": true},
+  {"query": "redact every social-security number in this contract PDF", "should_trigger": true},
+  {"query": "get me the page count and embedded metadata of each PDF in this folder", "should_trigger": true},
+  {"query": "turn this 80-page PDF into clean markdown preserving the headings", "should_trigger": true},
+  {"query": "compare two versions of a PDF and tell me what text changed", "should_trigger": true},
+
+  {"query": "generate a PDF invoice from this HTML template", "should_trigger": false},
+  {"query": "what's the best library to render a PDF in my React app's viewer?", "should_trigger": false},
+  {"query": "convert this Word .docx to PDF", "should_trigger": false},
+  {"query": "extract the tables from this Excel spreadsheet into CSV", "should_trigger": false},
+  {"query": "OCR this JPEG screenshot of a receipt", "should_trigger": false},
+  {"query": "scrape the product tables off this web page", "should_trigger": false},
+  {"query": "summarize the argument of this research paper for me", "should_trigger": false},
+  {"query": "design a print layout for a brochure", "should_trigger": false},
+  {"query": "why is my pdfkit install failing on Alpine Linux?", "should_trigger": false},
+  {"query": "extract the frames of this MP4 video as PNG images", "should_trigger": false}
+]

@@ -27,10 +27,22 @@ triggering.
    `write_text` uses UTF-8.
 3. **Command-vs-skill mismatch.** Upstream registered the candidate as a slash
    *command*, but current Claude Code only autonomously triggers *skills*, so
-   every should-trigger query scored 0. Now the candidate is written as a
-   temporary **skill** inside a per-query `tempfile.mkdtemp` project root — which
-   also isolates parallel workers from each other and prevents any
-   already-installed skill from competing.
+   every should-trigger query scored 0. The candidate is now written as a
+   temporary **skill** so the trigger test is faithful to how skills actually
+   fire.
+4. **User-scope skills shadowed the candidate → still all-zero.** Writing the
+   candidate into a throwaway *project* root does **not** hide user-scope skills:
+   `claude -p` loads `~/.claude/skills` (or `$CLAUDE_CONFIG_DIR/skills`)
+   regardless of cwd. If the skill under test is already installed there (the
+   normal case on a dev machine), the real skill competes and wins — the model
+   fires `Skill(skill="<real-name>")`, never the candidate's unique uuid name, so
+   detection scored 0 for every query. **Fix:** each query now runs with its own
+   isolated `CLAUDE_CONFIG_DIR` containing **only** the candidate skill (with
+   `.credentials.json`/`settings.json` copied so auth survives), plus
+   `stdin=DEVNULL` to skip a 3-second-per-query stdin wait. The candidate becomes
+   the sole skill in scope, so the model can only fire it and the score reflects
+   the **candidate** description. Verified: a skill that scored all-0 before now
+   scores 22/22 with correctly discriminating positives/negatives.
 
 ## Requirements
 
